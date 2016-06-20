@@ -25,16 +25,6 @@ namespace WebUI.Controllers
                     ReturnUrl = returnUrl
                 });
         }
-        //public Cart GetCart()
-        //{
-        //    Cart cart = (Cart)Session["Cart"];
-        //    if(cart == null)
-        //    {
-        //        cart = new Cart();
-        //        Session["Cart"] = cart;
-        //    }
-        //    return cart;
-        //}
         public RedirectToRouteResult AddCart(Cart cart, int bookId, string returnUrl)
         {
             Book book = repository.Books
@@ -54,6 +44,14 @@ namespace WebUI.Controllers
                 cart.RemoveLine(book);
             }
             return RedirectToAction("Index", new { returnUrl });
+        }
+        public PartialViewResult Summary(Cart cart)
+        {
+            return PartialView(cart);
+        }
+        public ViewResult Checkout(Cart cart, ShippingDetails shippingDetails)
+        {
+            return View(new ShippingDetails());
         }
 
     }

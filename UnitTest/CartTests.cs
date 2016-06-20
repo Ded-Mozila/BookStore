@@ -6,6 +6,8 @@ using System.Linq;
 using Moq;
 using Domain.Abstract;
 using WebUI.Controllers;
+using System.Web.Mvc;
+using WebUI.Models;
 
 namespace UnitTest
 {
@@ -122,6 +124,38 @@ namespace UnitTest
 
         //После добавлениея книги в корзину - перенаправление на страницу корзины
         [TestMethod]
-        p
+        public void Adding_Book_To_Cart_Goes_To_Cart_Screen()
+        {
+            // Организация
+            Mock<IBookRepository> mock = new Mock<IBookRepository>();
+            mock.Setup(m => m.Books).Returns(new List<Book>{
+                new Book {BookId = 1, Name= "Book1", Genre = "Genre1"}
+            }.AsQueryable());
+
+            Cart cart = new Cart();
+            //Действия
+            CartController controller = new CartController(mock.Object);
+            RedirectToRouteResult result = controller.AddCart(cart, 2, "myUrl");
+            ///controller.AddCart(cart, 1, null);
+            // Утверждение
+            Assert.AreEqual(result.RouteValues["action"], "Index");
+            Assert.AreEqual(result.RouteValues["returnUrl"], "myUrl");
+        }
+
+        [TestMethod]
+        public void Can_View_Cart_contents()
+        {
+            // Организация
+            Cart cart = new Cart();
+            CartController target = new CartController(null);
+
+            CartIndexViewModel result = (CartIndexViewModel)target.Index(cart, "myUrl").ViewData.Model;
+           
+            // Утверждение
+            Assert.AreEqual(result.Cart, cart);
+            Assert.AreEqual(result.ReturnUrl,"myUrl");
+        }
+
+
     }
 }
