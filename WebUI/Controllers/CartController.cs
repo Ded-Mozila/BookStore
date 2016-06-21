@@ -12,10 +12,12 @@ namespace WebUI.Controllers
     public class CartController : Controller
     {
         private IBookRepository repository;
+        private IOrderProcessor orderProcessor;
 
-        public CartController(IBookRepository repo)
+        public CartController(IBookRepository repo, IOrderProcessor processor)
         {
             repository = repo;
+            orderProcessor = processor;
         }
         public ViewResult Index(Cart cart,string returnUrl)
         {
@@ -49,10 +51,28 @@ namespace WebUI.Controllers
         {
             return PartialView(cart);
         }
-        public ViewResult Checkout(Cart cart, ShippingDetails shippingDetails)
+        public ViewResult Checkout()
         {
             return View(new ShippingDetails());
         }
+        [HttpPost]
+        public ViewResult Checkout(Cart cart, ShippingDetails shippingDetails)
+        {
+            if (cart.Lines.Count() == 0)
+            {
+                ModelState.AddModelError("", "Извините, корзина пуста!");
+            }
 
+            if (ModelState.IsValid)
+            {
+                orderProcessor.ProcessOrder(cart, shippingDetails);
+                cart.Clear();
+                return View("Completed");
+            }
+            else
+            {
+                return View(new ShippingDetails());
+            }
+        }
     }
 }

@@ -6,8 +6,10 @@
 
 <h2>Оформить заказ</h2>
 <p>Пожалуйста, введите Ваши контактные данныею</p>
-@using(Html.BeginForm())
+@using (Html.BeginForm())
 {
+    @Html.ValidationSummary();
+
     <h3>Дынные </h3>
     <div class="form-group">
         <label for="">Ваше имя:</label>
